@@ -5,3 +5,4 @@ authors = ["floriama <florian@marending.dev>"]
 edition = "2018"
 
 [dependencies]
+walkdir="2.3.1"
