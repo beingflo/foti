@@ -1,8 +1,0 @@
-[package]
-name = "server"
-version = "0.1.0"
-authors = ["floriama <florian@marending.dev>"]
-edition = "2018"
-
-[dependencies]
-walkdir="2.3.1"
