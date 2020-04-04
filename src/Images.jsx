@@ -1,12 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
+import media from './media'
 
 const VisibilitySensor = require('react-visibility-sensor').default;
 const numRequest = 10;
 
 const ImageContainer = styled.div`
-  margin: 2%;
-`;
+   ${media.mobile`
+      margin: 4%;
+   `}
+   ${media.web`
+      margin: 4% 20%;
+   `}
+`
 
 class Images extends React.Component {
     constructor(props) {
