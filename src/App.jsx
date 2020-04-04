@@ -1,13 +1,12 @@
-import React from 'react';
-import Images from './Images';
-import styled from 'styled-components'
+import React from 'react'
+import Images from './Images'
 
 function App() {
-  return (
-    <div className="App">
-      <Images />
-    </div>
-  );
+    return (
+        <div className="App">
+            <Images />
+        </div>
+    );
 }
 
 export default App;
