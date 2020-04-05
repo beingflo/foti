@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import media from './media'
 import { throttle } from 'underscore'
 
-const ws_address = 'ws://localhost:5678/ws'
+const ws_address = 'ws://192.168.1.196:5678/ws'
 const num_images_request = 10;
 const reload_percentage = 0.8
 const scroll_event_throttle = 500
@@ -35,7 +35,6 @@ class Images extends React.Component {
     }
 
     handleScroll(_event) {
-        console.log("in scroll handler")
         if(this.state.reached_end) {
             return;
         }
