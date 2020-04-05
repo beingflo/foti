@@ -12,7 +12,7 @@
 /build
 
 # python
-.pyc
+*.py[cod]
 
 # misc
 .DS_Store
