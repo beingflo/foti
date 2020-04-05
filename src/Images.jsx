@@ -1,11 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 import media from './media'
+import { throttle } from 'underscore'
 
 const ws_address = 'ws://localhost:5678/ws'
 const num_images_request = 10;
 const reload_percentage = 0.8
-const scroll_event_throttle = 1000
+const scroll_event_throttle = 500
 
 const ImageContainer = styled.div`
    ${media.mobile`
@@ -34,6 +35,7 @@ class Images extends React.Component {
     }
 
     handleScroll(_event) {
+        console.log("in scroll handler")
         if(this.state.reached_end) {
             return;
         }
@@ -59,7 +61,7 @@ class Images extends React.Component {
     }
 
     componentDidMount() {
-        window.addEventListener("scroll", (e) => this.handleScroll(e));
+        window.addEventListener("scroll", throttle((e) => this.handleScroll(e), scroll_event_throttle));
         this.setState({ mounted: true });
 
         this.ws.onopen = () => {
