@@ -3,7 +3,9 @@ import styled from 'styled-components'
 import media from './media'
 
 const VisibilitySensor = require('react-visibility-sensor').default;
-const numRequest = 20;
+
+const ws_address = 'ws://localhost:5678/ws'
+const numRequest = 10;
 const scrollDistance = 20
 
 const ImageContainer = styled.div`
@@ -24,7 +26,7 @@ class Images extends React.Component {
             mounted: false
         }
 
-        this.ws = new WebSocket('ws://192.168.1.196:5678/ws')
+        this.ws = new WebSocket(ws_address)
     }
 
     onScroll(id, isVisible) {
