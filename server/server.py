@@ -2,6 +2,7 @@ import os
 import base64
 from io import BytesIO
 from PIL import Image
+import json
 import images
 
 l2_directory = "/home/florian/.cache/photos/"
@@ -19,14 +20,26 @@ def to_base64(img):
 
 
 async def serve(websocket, path):
-    idx = 0
     while True:
-        request = int(await websocket.recv())
-        for _ in range(request):
-            print("Sending ", idx)
+        request = await websocket.recv()
+        request_data = json.loads(request)
+        print("Received request: ", request_data)
 
-            imagename = os.path.join(l2_directory, l2_images[idx][0], l2_images[idx][1])
+        # Available images are queried
+        if request_data['type'] == 'dir':
+            response = { 'dir': request_data['dir'], 'file': [] }
+            for folder, file in l2_images:
+                if folder.startswith(request_data['dir']):
+                    response['file'].append(file)
+            
+            await websocket.send(json.dumps(response))
+
+        # Specific file is querried
+        elif request_data['type'] == 'image':
+            if request_data['file'] == 'undefined':
+                continue
+            imagename = os.path.join(l2_directory, request_data['dir'], request_data['file'])
             image = Image.open(imagename)
 
-            await websocket.send(to_base64(image).decode("ascii"))
-            idx += 1
+            response = { 'filename' : request_data['file'],'image' : to_base64(image).decode("ascii") }
+            await websocket.send(json.dumps(response))
