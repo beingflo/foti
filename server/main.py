@@ -7,15 +7,26 @@ import os, os.path
 import base64
 from io import BytesIO
 
-imgs = []
-directory = "/home/florian/.cache/photos/l2/2017/USA/New_York"
+l2_directory = "/home/florian/.cache/photos/"
+l1_directory = "/home/florian/Pictures"
+
+l2_images = []
+l1_images = []
 
 def load_images(path):
-    for f in os.listdir(path):
-        ext = os.path.splitext(f)[1]
-        if ext.lower() != ".jpg":
-            continue
-        imgs.append(Image.open(os.path.join(path,f)))
+    images = []
+    for root, _, files in os.walk(path):
+        for f in files:
+            ext = os.path.splitext(f)[1]
+            if ext.lower() != ".jpg":
+                continue
+            folder = root[len(path):]
+            filename = f
+            images.append((folder, filename))
+
+    images = sorted(images, key=lambda x: x[1])
+    images.reverse()
+    return images
 
 def to_base64(img):
     buffered = BytesIO()
@@ -29,10 +40,15 @@ async def time(websocket, path):
         request = int(await websocket.recv())
         for _ in range(request):
             print("Sending ", idx)
-            await websocket.send(to_base64(imgs[idx]).decode("ascii"))
+
+            imagename = os.path.join(l2_directory, l2_images[idx][0], l2_images[idx][1])
+            image = Image.open(imagename)
+
+            await websocket.send(to_base64(image).decode("ascii"))
             idx += 1
 
-load_images(directory)
+l2_images = load_images(l2_directory)
+
 start_server = websockets.serve(time, "192.168.1.196", 5678)
 
 asyncio.get_event_loop().run_until_complete(start_server)

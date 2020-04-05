@@ -3,14 +3,15 @@ import styled from 'styled-components'
 import media from './media'
 
 const VisibilitySensor = require('react-visibility-sensor').default;
-const numRequest = 10;
+const numRequest = 20;
+const scrollDistance = 20
 
 const ImageContainer = styled.div`
    ${media.mobile`
       margin: 4%;
    `}
    ${media.web`
-      margin: 4% 20%;
+      margin: 1% 35%;
    `}
 `
 
@@ -27,7 +28,7 @@ class Images extends React.Component {
     }
 
     onScroll(id, isVisible) {
-        if (this.state.mounted && isVisible && id >= this.state.numImages - 10) {
+        if (this.state.mounted && isVisible && id >= this.state.numImages - scrollDistance) {
             console.log("id: " + id)
             console.log("numImages: " + this.state.numImages)
             console.log("Requesting %s images", numRequest)
