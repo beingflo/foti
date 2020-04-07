@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import media from './media'
 import { throttle } from 'underscore'
 
-const ws_address = 'ws://192.168.1.196:5678/ws'
+const ws_address = 'ws://192.168.0.157:5678/ws'
 const num_images_request = 10;
-const reload_percentage = 0.8
+const reload_percentage = 0.7
 const scroll_event_throttle = 500
 
 const ImageContainer = styled.div`
@@ -23,11 +23,11 @@ class Images extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            image_names: [],
             images: {},
+            image_names: [],
             num_images: 0,
             reached_end: false,
-            folder: '',
+            folder: '/',
             mounted: false
         }
 
@@ -42,17 +42,18 @@ class Images extends React.Component {
 
         if (this.state.mounted && window.scrollY >= reload_percentage * imagepane_height) {
             for(let i = 0; i <= num_images_request; i++) {
-                const filename = this.state.image_names[this.state.num_images + i]
-                const request = `{
-                    "type" : "image",
-                    "dir" : "${this.state.folder}",
-                    "file" : "${filename}"
-                }`
-                console.log("Requesting " + filename)
-                if(filename === undefined) {
+                // Reached end of list
+                if(i + this.state.num_images >= this.state.image_names.length) {
                     this.setState({ reached_end: true })
                     return;
                 }
+                const [dir, name] = this.state.image_names[this.state.num_images + i]
+                const request = `{
+                    "type" : "image",
+                    "dir" : "${dir}",
+                    "file" : "${name}"
+                }`
+                console.log("Requesting " + dir + "/" + name)
                 this.ws.send(request)
             }
             this.setState({ num_images: this.state.num_images + num_images_request })
@@ -69,7 +70,7 @@ class Images extends React.Component {
             // Request list of available images in root
             const query = `{
                 "type" : "dir",
-                "dir" : "2018/Eymatt"
+                "dir" : "${this.state.folder}"
             }`
 
             this.ws.send(query)
@@ -79,20 +80,25 @@ class Images extends React.Component {
             const message = evt.data
             const response = JSON.parse(message)
 
-            if ('file' in response) {
-                const images = {}
-                response['file'].forEach(filename => {
-                    images[filename] = [false, null];
+            if ('files' in response) {
+                let images = {}
+                let image_names = []
+                response['files'].forEach(file => {
+                    const dir = file['dir']
+                    const name = file['name']
+                    images[name] = [false, null];
+                    image_names.push([dir, name])
                 });
 
-                this.setState({ images: images, image_names: response['file'], folder: response['dir'] });
+                this.setState({ images: images, image_names: image_names });
+                console.log(image_names)
 
                 // Request first images
                 for (let i = 0; i < num_images_request; i++) {
                     const request = `{
                         "type" : "image",
-                        "dir" : "${this.state.folder}",
-                        "file" : "${this.state.image_names[i]}"
+                        "dir" : "${this.state.image_names[i][0]}",
+                        "file" : "${this.state.image_names[i][1]}"
                     }`
                     this.ws.send(request)
                 }
@@ -118,9 +124,9 @@ class Images extends React.Component {
     }
 
     render() {
-        const visImgs = this.state.image_names.filter((im_name, idx) => this.state.images[im_name][0]).map((im_name, idx) => (
-            <ImageContainer key={im_name}>
-                <img src={"data:image/jpg;base64," + this.state.images[im_name][1]} alt="" width="100%" />
+        const visImgs = this.state.image_names.filter(([dir, name], idx) => this.state.images[name][0]).map(([_, name], idx) => (
+            <ImageContainer key={name}>
+                <img src={"data:image/jpg;base64," + this.state.images[name][1]} alt="" width="100%" />
             </ImageContainer>
         ));
 

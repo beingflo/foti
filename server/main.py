@@ -4,7 +4,7 @@ import websockets
 
 import server
 
-ip = "192.168.1.196"
+ip = "192.168.0.157"
 port = 5678
 
 start_server = websockets.serve(server.serve, ip, port)

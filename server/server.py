@@ -27,19 +27,23 @@ async def serve(websocket, path):
 
         # Available images are queried
         if request_data['type'] == 'dir':
-            response = { 'dir': request_data['dir'], 'file': [] }
+            files = []
             for folder, file in l2_images:
                 if folder.startswith(request_data['dir']):
-                    response['file'].append(file)
+                    files.append({ 'dir': folder, 'name': file })
             
+            response = { 'files': files }
             await websocket.send(json.dumps(response))
 
         # Specific file is querried
         elif request_data['type'] == 'image':
             if request_data['file'] == 'undefined':
                 continue
-            imagename = os.path.join(l2_directory, request_data['dir'], request_data['file'])
+
+            folder = request_data['dir'][1:]
+            file = request_data['file']
+            imagename = os.path.join(l2_directory, folder, file)
             image = Image.open(imagename)
 
-            response = { 'filename' : request_data['file'],'image' : to_base64(image).decode("ascii") }
+            response = { 'filename' : file,'image' : to_base64(image).decode("ascii") }
             await websocket.send(json.dumps(response))

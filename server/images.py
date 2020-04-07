@@ -7,7 +7,7 @@ def load_images(path):
             ext = os.path.splitext(f)[1]
             if ext.lower() != ".jpg":
                 continue
-            folder = root[len(path):]
+            folder = "/" + root[len(path):]
             filename = f
             images.append((folder, filename))
 
