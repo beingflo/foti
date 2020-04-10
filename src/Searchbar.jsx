@@ -11,11 +11,13 @@ const Bar = styled.input`
     -moz-appearance: none;
     appearance: none;
 
-    /* Then Style */
     border-radius: 2px;
     border: 1px solid #BBB;
     line-height: 20px;
     outline: none;    
+
+    padding-left: 5px;
+
 `;
 
 const Top = styled.div`
