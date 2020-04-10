@@ -6,7 +6,7 @@ import json
 import images
 
 l2_directory = "/home/florian/.cache/photos/"
-l1_directory = "/home/florian/Pictures"
+l1_directory = "/home/florian/Pictures/"
 
 l2_images = []
 l1_images = []

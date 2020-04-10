@@ -1,21 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import media from './media'
 import { throttle } from 'underscore'
 
-const ws_address = 'ws://192.168.0.157:5678/ws'
+const ws_address = 'ws://192.168.1.196:5678/ws'
 const num_images_request = 10;
 const reload_percentage = 0.7
 const scroll_event_throttle = 500
-
-const ImageContainer = styled.div`
-   ${media.mobile`
-      margin: 4%;
-   `}
-   ${media.web`
-      margin: 1% 35%;
-   `}
-`
 
 const ImagePane = styled.div``
 
@@ -27,7 +17,7 @@ class Images extends React.Component {
             image_names: [],
             num_images: 0,
             reached_end: false,
-            folder: '/',
+            folder: '/2018',
             mounted: false
         }
 
@@ -91,7 +81,6 @@ class Images extends React.Component {
                 });
 
                 this.setState({ images: images, image_names: image_names });
-                console.log(image_names)
 
                 // Request first images
                 for (let i = 0; i < num_images_request; i++) {
@@ -125,9 +114,9 @@ class Images extends React.Component {
 
     render() {
         const visImgs = this.state.image_names.filter(([dir, name], idx) => this.state.images[name][0]).map(([_, name], idx) => (
-            <ImageContainer key={name}>
+            <div key={name}>
                 <img src={"data:image/jpg;base64," + this.state.images[name][1]} alt="" width="100%" />
-            </ImageContainer>
+            </div>
         ));
 
         return (
