@@ -26,13 +26,14 @@ async def serve(websocket, path):
         print("Received request: ", request_data)
 
         # Available images are queried
-        if request_data['type'] == 'dir':
+        if request_data['type'] == 'query':
             files = []
             for folder, file in l2_images:
-                if folder.startswith(request_data['dir']):
+                if request_data['query'] in folder:
                     files.append({ 'dir': folder, 'name': file })
             
             response = { 'files': files }
+            print("Sending file list of {} entries".format(len(files)))
             await websocket.send(json.dumps(response))
 
         # Specific file is querried

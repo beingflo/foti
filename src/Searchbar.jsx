@@ -34,12 +34,12 @@ class Searchbar extends React.Component {
         super(props);
 
         this.state = {
-            search: '',
+            setQuery: props.setQuery,
         }
     }
 
     handleChange(event) {
-        this.setState({ search: event.target.value });
+        this.state.setQuery(event.target.value);
     }
 
     handleSubmit(event) {
