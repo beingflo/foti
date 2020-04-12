@@ -1,4 +1,5 @@
 import os, os.path
+import logging
 from PIL import Image
 
 class Store:
@@ -8,17 +9,13 @@ class Store:
 
         self.imagelist = self.load_imagelist()
         self.check_directories()
-
-        self.cache = {}
     
     def get_image(self, path, file):
         name = os.path.join(self.l2, path, file)
 
-        if(not name in self.cache):
-            image = Image.open(name)
-            self.cache[name] = image
+        image = Image.open(name)
 
-        return self.cache[name]
+        return image
 
     def get_imagelist(self):
         return self.imagelist
@@ -27,6 +24,7 @@ class Store:
         pass
 
     def generate_l2(self, path):
+        logging.info("Generating l2 image for {}".format(path))
         pass
 
     def load_imagelist(self):
