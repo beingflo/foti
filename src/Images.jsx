@@ -30,7 +30,7 @@ class Images extends React.Component {
             return;
         }
 
-        for(let i = 0; i <= num_images_request; i++) {
+        for(let i = 0; i < num_images_request; i++) {
             // Reached end of list
             if(i + this.state.num_images >= this.state.image_names.length) {
                 this.setState({ reached_end: true })
