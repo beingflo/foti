@@ -36,13 +36,12 @@ class Images extends React.Component {
                 this.setState({ reached_end: true })
                 return;
             }
-            const [dir, name] = this.state.image_names[this.state.num_images + i]
+            const name = this.state.image_names[this.state.num_images + i]
             const request = `{
                 "type" : "image",
-                "dir" : "${dir}",
-                "file" : "${name}"
+                "name" : "${name}"
             }`
-            console.log("Requesting " + dir + "/" + name)
+            console.log("Requesting " + name)
             this.ws.send(request)
         }
         this.setState({ num_images: this.state.num_images + num_images_request })
@@ -92,22 +91,22 @@ class Images extends React.Component {
             const message = evt.data
             const response = JSON.parse(message)
 
-            if ('files' in response) {
+            if (response['type'] === 'queryresponse') {
+                console.log(response)
                 let images = {}
                 let image_names = []
                 response['files'].forEach(file => {
-                    const dir = file['dir']
                     const name = file['name']
                     images[name] = [false, null];
-                    image_names.push([dir, name])
+                    image_names.push(name)
                 });
 
                 this.setState({ images: images, image_names: image_names });
 
                 // Request first images
                 this.fetchImages();
-            } else if ('image' in response) {
-                const name = response['filename']
+            } else if (response['type'] === 'imageresponse') {
+                const name = response['name']
                 const image = response['image']
 
                 this.setState(prevState => ({
@@ -125,7 +124,7 @@ class Images extends React.Component {
     }
 
     render() {
-        const visImgs = this.state.image_names.filter(([dir, name], idx) => this.state.images[name][0]).map(([_, name], idx) => (
+        const visImgs = this.state.image_names.filter((name, idx) => this.state.images[name][0]).map((name, idx) => (
             <div key={name}>
                 <img src={"data:image/jpg;base64," + this.state.images[name][1]} alt="" width="100%" />
             </div>

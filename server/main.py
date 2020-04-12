@@ -15,9 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 logging.info("Listening on {}:{}".format(ip, port))
 
+store = Store(l1, l2)
+
 async def serve(websocket, path):
     logging.info("New websocket connection from {}".format(websocket.remote_address[0]))
-    store = Store(l1, l2)
     server = Server(websocket, store)
 
     while True:

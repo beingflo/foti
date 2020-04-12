@@ -21,26 +21,26 @@ class Server:
 
         # Specific file is querried
         elif request['type'] == 'image':
-            logging.info("Received image request: {}".format(request['dir']+"/"+request['file']))
+            logging.info("Received image request: {}".format(request['name']))
             response = self.image_response(request)
             await self.websocket.send(json.dumps(response))
         
     def imagelist_response(self, request):
         files = []
         for folder, file in self.store.get_imagelist():
-            if request['query'] in folder:
-                files.append({ 'dir': folder, 'name': file })
+            name = os.path.join(folder, file)
+            if request['query'] in name:
+                files.append({ 'name': name })
         
         logging.info("Sending file list of {} entries".format(len(files)))
-        return { 'files': files }
+        return { 'type': 'queryresponse', 'files': files }
     
     def image_response(self, request):
-        folder = request['dir'][1:]
-        file = request['file']
+        name= request['name']
 
-        image = self.store.get_image(folder, file)
+        image = self.store.get_image_l2(name)
 
-        return { 'filename' : file,'image' : to_base64(image).decode("ascii") }
+        return { 'type': 'imageresponse', 'name' : name, 'image' : to_base64(image).decode("ascii") }
 
 def to_base64(img):
     buffered = BytesIO()
