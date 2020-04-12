@@ -47,7 +47,7 @@ class Store:
             if not name in images_dict_l2:
                 self.generate_l2(folder, file)
 
-        logging.info("Checking thumbnail cache complete")
+        logging.info("Checking L2 cache complete")
 
     def generate_l2(self, path, file):
         abs_path_l1 = os.path.join(self.l1, path)
@@ -91,7 +91,15 @@ class Store:
                 folder = root[len(self.l1):]
                 images.append((folder, f))
 
-        images = sorted(images, key=lambda x: (x[0] + x[1]))
+        images = sorted(images, key=lambda x: get_date(os.path.join(self.l1, x[0], x[1])))
         images.reverse()
 
         return images
+
+def get_date(image):
+    file = Image.open(image)
+
+    exif = dict(file.getexif())
+    exif = dict((ExifTags.TAGS[k], v) for k, v in exif.items() if k in ExifTags.TAGS)
+
+    return exif['DateTime']
