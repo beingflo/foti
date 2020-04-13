@@ -4,7 +4,7 @@ import ImageView from './ImageView'
 const ws_address = 'ws://192.168.1.196:5678/ws'
 
 const concurrent_image_requests = 10
-const reload_percentage = 0.9
+const reload_percentage = 0.8
 
 class Images extends React.Component {
     constructor(props) {
@@ -24,10 +24,6 @@ class Images extends React.Component {
     fetchImages(until=0) {
         let i = this.state.downloaded_idx;
         let req = this.state.outstanding_requests;
-
-        console.log("Fetching with until=" + until)
-        console.log("Fetching with downloaded_idx=" + this.state.downloaded_idx)
-        console.log(this.state.image_list_filtered)
 
         if(until === 0) {
             until = this.state.image_list_filtered.length
@@ -124,7 +120,7 @@ class Images extends React.Component {
                         [name]: image
                     },
                     outstanding_requests: prevState.outstanding_requests - 1,
-                }), this.checkAndFetch())
+                }), () => this.checkAndFetch())
             }
         }
 
@@ -136,11 +132,11 @@ class Images extends React.Component {
     componentDidUpdate() {
         if(this.props.filter !== this.state.filter) {
             // Only show images that match filter 
-            console.log(this.props.filter)
             let new_filtered_list = this.state.image_list.filter(name => name.includes(this.props.filter))
-            console.log(new_filtered_list)
 
             this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(10))
+
+            window.scrollTo(0,0)
         }
     }
 
