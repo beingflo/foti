@@ -1,9 +1,9 @@
 import React from 'react'
 import ImageView from './ImageView'
 
-const ws_address = 'ws://127.0.0.1:5678/ws'
+const ws_address = 'ws://192.168.1.196:5678/ws'
 
-const concurrent_image_requests = 30
+const concurrent_image_requests = 10
 const reload_percentage = 0.9
 
 class Images extends React.Component {
@@ -21,11 +21,19 @@ class Images extends React.Component {
         this.ws = new WebSocket(ws_address)
     }
 
-    fetchImages() {
+    fetchImages(until=0) {
         let i = this.state.downloaded_idx;
         let req = this.state.outstanding_requests;
 
-        while(i < this.state.image_list_filtered.length && req < concurrent_image_requests + 5) {
+        console.log("Fetching with until=" + until)
+        console.log("Fetching with downloaded_idx=" + this.state.downloaded_idx)
+        console.log(this.state.image_list_filtered)
+
+        if(until === 0) {
+            until = this.state.image_list_filtered.length
+        }
+
+        while(i < until && req < concurrent_image_requests + 5) {
             const name = this.state.image_list_filtered[i]
 
             // Not already fetched
@@ -39,6 +47,8 @@ class Images extends React.Component {
                 this.ws.send(request)
 
                 req += 1
+            } else {
+                console.log("Already fetched " + name)
             }
 
             i += 1
@@ -124,11 +134,16 @@ class Images extends React.Component {
     componentDidUpdate() {
         if(this.props.filter !== this.state.filter) {
             // Only show images that match filter 
+            console.log(this.props.filter)
+            let new_filtered_list = this.state.image_list.filter(name => name.includes(this.props.filter))
+            console.log(new_filtered_list)
+
+            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(10))
         }
     }
 
     render() {
-        return <ImageView images={this.state.images} image_list={this.state.image_list} />
+        return <ImageView images={this.state.images} image_list={this.state.image_list_filtered} />
     }
 }
 

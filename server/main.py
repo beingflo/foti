@@ -5,7 +5,7 @@ import logging
 from server import Server
 from store import Store 
 
-ip = "127.0.0.1"
+ip = "192.168.1.196"
 port = 5678
 
 l1 = "/home/florian/Pictures/"
