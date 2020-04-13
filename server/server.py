@@ -14,8 +14,8 @@ class Server:
         request = json.loads(request_raw)
 
         # Available images are queried
-        if request['type'] == 'query':
-            logging.info("Received query: {}".format(request['query']))
+        if request['type'] == 'filter':
+            logging.info("Received filter: {}".format(request['filter']))
             response = self.imagelist_response(request)
             await self.websocket.send(json.dumps(response))
 
@@ -25,15 +25,19 @@ class Server:
             response = self.image_response(request)
             await self.websocket.send(json.dumps(response))
         
+        # Logging message is sent
+        elif request['type'] == 'info':
+            logging.info(request['info'])
+        
     def imagelist_response(self, request):
         files = []
         for folder, file in self.store.get_imagelist():
             name = os.path.join(folder, file)
-            if request['query'] in name:
+            if request['filter'] in name:
                 files.append({ 'name': name })
         
         logging.info("Sending file list of {} entries".format(len(files)))
-        return { 'type': 'queryresponse', 'files': files }
+        return { 'type': 'filterresponse', 'files': files }
     
     def image_response(self, request):
         name= request['name']

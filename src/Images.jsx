@@ -1,84 +1,82 @@
 import React from 'react'
-import styled from 'styled-components'
-import { throttle } from 'underscore'
+import ImageView from './ImageView'
 
-const ws_address = 'ws://192.168.1.196:5678/ws'
+const ws_address = 'ws://127.0.0.1:5678/ws'
 
-const num_images_request = 10;
-const reload_percentage = 0.7
-const scroll_event_throttle = 500
-
-const ImagePane = styled.div``
+const concurrent_image_requests = 30
+const reload_percentage = 0.9
 
 class Images extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             images: {},
-            image_names: [],
-            num_images: 0,
-            reached_end: false,
-            query: '',
-            mounted: false
+            image_list: [],
+            image_list_filtered: [],
+            downloaded_idx: 0,
+            outstanding_requests: 0,
+            filter: '',
         }
 
         this.ws = new WebSocket(ws_address)
     }
 
     fetchImages() {
-        if(this.state.reached_end) {
-            return;
+        let i = this.state.downloaded_idx;
+        let req = this.state.outstanding_requests;
+
+        while(i < this.state.image_list_filtered.length && req < concurrent_image_requests + 5) {
+            const name = this.state.image_list_filtered[i]
+
+            // Not already fetched
+            if(!(name in this.state.images)) {
+                console.log("Fetching " + name)
+
+                const request = `{
+                    "type" : "image",
+                    "name" : "${name}"
+                }`
+                this.ws.send(request)
+
+                req += 1
+            }
+
+            i += 1
         }
 
-        for(let i = 0; i < num_images_request; i++) {
-            // Reached end of list
-            if(i + this.state.num_images >= this.state.image_names.length) {
-                this.setState({ reached_end: true })
-                return;
+        this.setState({ downloaded_idx: i, outstanding_requests: req })
+    }
+
+    checkAndFetch() {
+        const imagepane_height = document.getElementById('imagepane').clientHeight
+
+        if (window.scrollY >= reload_percentage * imagepane_height) {
+            if(this.state.outstanding_requests < concurrent_image_requests) {
+                this.fetchImages();
             }
-            const name = this.state.image_names[this.state.num_images + i]
-            const request = `{
-                "type" : "image",
-                "name" : "${name}"
-            }`
-            console.log("Requesting " + name)
-            this.ws.send(request)
         }
-        this.setState({ num_images: this.state.num_images + num_images_request })
     }
 
     fetchImageList() {
-        const query = `{
-            "type" : "query",
-            "query" : "${this.state.query}"
+        const filter = `{
+            "type" : "filter",
+            "filter" : "${this.state.filter}"
         }`
 
-        this.ws.send(query)
+        this.ws.send(filter)
     }
 
-    handleScroll(_event) {
-        const imagepane_height = document.getElementById('imagepane').clientHeight
+    sendInfo(info) {
+        const message = `{
+            "type" : "info",
+            "info" : "${info}"
+        }`
 
-        if (this.state.mounted && window.scrollY >= reload_percentage * imagepane_height) {
-            this.fetchImages();
-        }
-    }
-
-    componentDidUpdate() {
-        if(this.props.query !== this.state.query) {
-            this.setState({
-                images: {},
-                image_names: [],
-                num_images: 0,
-                query: this.props.query,
-                reached_end: false
-            }, this.fetchImageList);
-        }
+        this.ws.send(message)
     }
 
     componentDidMount() {
-        window.addEventListener("scroll", throttle((e) => this.handleScroll(e), scroll_event_throttle));
-        this.setState({ mounted: true });
+        window.addEventListener("scroll", e => this.checkAndFetch())
 
         this.ws.onopen = () => {
             console.log('Connected')
@@ -91,20 +89,19 @@ class Images extends React.Component {
             const message = evt.data
             const response = JSON.parse(message)
 
-            if (response['type'] === 'queryresponse') {
-                console.log(response)
-                let images = {}
-                let image_names = []
+            if (response['type'] === 'filterresponse') {
+                let image_list = []
                 response['files'].forEach(file => {
-                    const name = file['name']
-                    images[name] = [false, null];
-                    image_names.push(name)
+                    image_list.push(file['name'])
                 });
 
-                this.setState({ images: images, image_names: image_names });
+                this.setState({ image_list: image_list, image_list_filtered: image_list, downloaded_idx: 0 });
+
+                this.sendInfo('Got list of available images')
 
                 // Request first images
                 this.fetchImages();
+
             } else if (response['type'] === 'imageresponse') {
                 const name = response['name']
                 const image = response['image']
@@ -112,9 +109,10 @@ class Images extends React.Component {
                 this.setState(prevState => ({
                     images: {
                         ...prevState.images,
-                        [name]: [true, image] 
-                    }
-                }))
+                        [name]: image
+                    },
+                    outstanding_requests: prevState.outstanding_requests - 1,
+                }), this.checkAndFetch())
             }
         }
 
@@ -123,18 +121,14 @@ class Images extends React.Component {
         }
     }
 
-    render() {
-        const visImgs = this.state.image_names.filter((name, idx) => this.state.images[name][0]).map((name, idx) => (
-            <div key={name}>
-                <img src={"data:image/jpg;base64," + this.state.images[name][1]} alt="" width="100%" />
-            </div>
-        ));
+    componentDidUpdate() {
+        if(this.props.filter !== this.state.filter) {
+            // Only show images that match filter 
+        }
+    }
 
-        return (
-            <ImagePane id="imagepane">
-                { visImgs }
-            </ImagePane>
-        );
+    render() {
+        return <ImageView images={this.state.images} image_list={this.state.image_list} />
     }
 }
 

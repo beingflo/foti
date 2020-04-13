@@ -15,12 +15,12 @@ const Container = styled.div`
 
 
 function App() {
-    const [query, setQuery] = React.useState('');
+    const [filter, setFilter] = React.useState('');
 
     return (
         <Container className="App">
-            <Searchbar setQuery={setQuery} />
-            <Images query={query} />
+            <Searchbar setFilter={setFilter} />
+            <Images filter={filter} />
         </Container>
     );
 }

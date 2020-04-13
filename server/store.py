@@ -76,9 +76,6 @@ class Store:
         elif exif['Orientation'] == 8 : 
             image=image.rotate(90, expand=True)
 
-        #print(exif['DateTimeOriginal'])
-        #print(exif['Orientation'])
-
         image.save(abs_file_l2, optimize=True, quality=90)
 
     def load_imagelist(self):
