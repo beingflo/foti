@@ -33,6 +33,8 @@ class Images extends React.Component {
             until = this.state.image_list_filtered.length
         }
 
+        until = Math.min(until, this.state.image_list_filtered.length)
+
         while(i < until && req < concurrent_image_requests + 5) {
             const name = this.state.image_list_filtered[i]
 
