@@ -99,4 +99,7 @@ def get_date(image):
     exif = dict(file.getexif())
     exif = dict((ExifTags.TAGS[k], v) for k, v in exif.items() if k in ExifTags.TAGS)
 
-    return exif['DateTime']
+    if 'DateTimeOriginal' in exif:
+        return exif['DateTimeOriginal']
+    else:
+        return exif['DateTime']
