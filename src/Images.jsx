@@ -132,7 +132,8 @@ class Images extends React.Component {
     componentDidUpdate() {
         if(this.props.filter !== this.state.filter) {
             // Only show images that match filter 
-            let new_filtered_list = this.state.image_list.filter(name => name.includes(this.props.filter))
+            const filter = this.props.filter.toLowerCase()
+            let new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(filter))
 
             this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(10))
 
