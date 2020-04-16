@@ -1,7 +1,7 @@
 import React from 'react'
 import ImageView from './ImageView'
 
-const ws_address = 'ws://192.168.1.196:5678/ws'
+const ws_address = 'ws://192.168.0.157:5678/ws'
 
 const concurrent_image_requests = 10
 const reload_percentage = 0.8

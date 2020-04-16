@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 const sizes = {
-   web: 800,
+   web: 1000,
    mobile: 0
 }
 

@@ -6,11 +6,17 @@ const ImagePane = styled.div``
 function ImageView(props) {
     const { images, image_list } = props;
 
-    const visImgs = image_list.filter(name => name in images).map(name => (
-        <div key={images[name]}>
-            <img src={"data:image/jpg;base64," + images[name]} alt="" width="100%" />
-        </div>
-    ));
+    let visImgs = []
+    let i = 0;
+    while(i < image_list.length && image_list[i] in images) {
+        visImgs.push(
+            <div key={images[image_list[i]]}>
+                <img src={"data:image/jpg;base64," + images[image_list[i]]} alt="" width="100%" />
+            </div>
+        );
+
+        i += 1
+    }
 
     return (
         <ImagePane id="imagepane">
