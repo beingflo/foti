@@ -18,6 +18,8 @@ class Images extends React.Component {
             filter: '',
             fullscreen_imagename: '',
             fullscreen_image: null,
+            scroll_at_click: 0,
+            exiting_fullscreen: false,
         }
 
         this.ws = new WebSocket(ws_address)
@@ -136,7 +138,10 @@ class Images extends React.Component {
                         outstanding_requests: prevState.outstanding_requests - 1,
                     }), () => this.checkAndFetch())
                 } else {
-                    this.setState({ fullscreen_image: image })
+                    // Disregard message, as image was already minimized again
+                    if(!(this.state.fullscreen_imagename === '')) {
+                        this.setState({ fullscreen_image: image })
+                    }
                 }
 
             }
@@ -168,6 +173,12 @@ class Images extends React.Component {
 
             window.scrollTo(0,0)
         }
+
+        if(this.state.exiting_fullscreen) {
+            window.scrollTo(0, this.state.scroll_at_click)
+
+            this.setState({ exiting_fullscreen: false })
+        }
     }
 
     handle_image_click(e) {
@@ -177,6 +188,7 @@ class Images extends React.Component {
 
         this.setState({
             fullscreen_imagename: name,
+            scroll_at_click: window.scrollY,
         });
     }
 
@@ -184,7 +196,10 @@ class Images extends React.Component {
         this.setState({
             fullscreen_image: null,
             fullscreen_imagename: '',
+            exiting_fullscreen: true,
         })
+
+        console.log(this.state.scroll_at_click)
     }
 
     render() {
