@@ -16,14 +16,15 @@ class Images extends React.Component {
             downloaded_idx: 0,
             outstanding_requests: 0,
             filter: '',
-            fullscreen_image: '',
+            fullscreen_imagename: '',
+            fullscreen_image: null,
         }
 
         this.ws = new WebSocket(ws_address)
     }
 
     fetchSingleImage(name, level) {
-        console.log("Fetching " + name)
+        console.log("Fetching " + level + ": " + name)
 
         const request = `{
             "type" : "image",
@@ -124,14 +125,20 @@ class Images extends React.Component {
             } else if (response['type'] === 'imageresponse') {
                 const name = response['name']
                 const image = response['image']
+                const level = response['level']
 
-                this.setState(prevState => ({
-                    images: {
-                        ...prevState.images,
-                        [name]: image
-                    },
-                    outstanding_requests: prevState.outstanding_requests - 1,
-                }), () => this.checkAndFetch())
+                if(level === 'l2') {
+                    this.setState(prevState => ({
+                        images: {
+                            ...prevState.images,
+                            [name]: image
+                        },
+                        outstanding_requests: prevState.outstanding_requests - 1,
+                    }), () => this.checkAndFetch())
+                } else {
+                    this.setState({ fullscreen_image: image })
+                }
+
             }
         }
 
@@ -169,16 +176,27 @@ class Images extends React.Component {
         this.fetchSingleImage(name, 'l1')
 
         this.setState({
-            fullscreen_image: name,
+            fullscreen_imagename: name,
         });
+    }
+
+    handle_fullscreen_exit() {
+        this.setState({
+            fullscreen_image: null,
+            fullscreen_imagename: '',
+        })
     }
 
     render() {
         let ret;
-        if(this.state.fullscreen_image === '') {
+        if(this.state.fullscreen_imagename === '') {
             ret = <ImageView images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
         } else {
-            ret = <img src={"data:image/jpg;base64," + this.state.images[this.state.fullscreen_image]} alt="" width="100%" />
+            let image = this.state.images[this.state.fullscreen_imagename]
+            if(this.state.fullscreen_image !== null) {
+                image = this.state.fullscreen_image
+            }
+            ret = <img src={"data:image/jpg;base64," + image} onClick={() => this.handle_fullscreen_exit()} alt="" width="100%" />
         }
 
         return ret;

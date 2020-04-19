@@ -41,13 +41,14 @@ class Server:
     
     def image_response(self, request):
         name = request['name']
+        level = request['level']
 
-        if request['level'] == 'l2':
+        if level == 'l2':
             image = self.store.get_image_l2(name)
         else:
             image = self.store.get_image_l1(name)
 
-        return { 'type': 'imageresponse', 'name' : name, 'image' : to_base64(image).decode("ascii") }
+        return { 'type': 'imageresponse', 'name' : name, 'level' : level, 'image' : to_base64(image).decode("ascii") }
 
 def to_base64(img):
     buffered = BytesIO()
