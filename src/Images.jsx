@@ -1,7 +1,7 @@
 import React from 'react'
 import ImageView from './ImageView'
 
-const ws_address = 'ws://192.168.0.157:5678/ws'
+const ws_address = 'ws://192.168.1.196:5678/ws'
 
 const concurrent_image_requests = 10
 const reload_percentage = 0.8
@@ -16,9 +16,21 @@ class Images extends React.Component {
             downloaded_idx: 0,
             outstanding_requests: 0,
             filter: '',
+            fullscreen_image: '',
         }
 
         this.ws = new WebSocket(ws_address)
+    }
+
+    fetchSingleImage(name, level) {
+        console.log("Fetching " + name)
+
+        const request = `{
+            "type" : "image",
+            "level" : "${level}",
+            "name" : "${name}"
+        }`
+        this.ws.send(request)
     }
 
     fetchImages(until=0) {
@@ -36,13 +48,7 @@ class Images extends React.Component {
 
             // Not already fetched
             if(!(name in this.state.images)) {
-                console.log("Fetching " + name)
-
-                const request = `{
-                    "type" : "image",
-                    "name" : "${name}"
-                }`
-                this.ws.send(request)
+                this.fetchSingleImage(name, 'l2')
 
                 req += 1
             } else {
@@ -56,6 +62,11 @@ class Images extends React.Component {
     }
 
     checkAndFetch() {
+        const imagepane = document.getElementById('imagepane')
+        if(imagepane === null) {
+            return;
+        }
+
         const imagepane_height = document.getElementById('imagepane').clientHeight
 
         if (window.scrollY >= reload_percentage * imagepane_height) {
@@ -152,8 +163,25 @@ class Images extends React.Component {
         }
     }
 
+    handle_image_click(e) {
+        const name = e.currentTarget.dataset.id
+
+        this.fetchSingleImage(name, 'l1')
+
+        this.setState({
+            fullscreen_image: name,
+        });
+    }
+
     render() {
-        return <ImageView images={this.state.images} image_list={this.state.image_list_filtered} />
+        let ret;
+        if(this.state.fullscreen_image === '') {
+            ret = <ImageView images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
+        } else {
+            ret = <img src={"data:image/jpg;base64," + this.state.images[this.state.fullscreen_image]} alt="" width="100%" />
+        }
+
+        return ret;
     }
 }
 

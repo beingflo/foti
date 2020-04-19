@@ -21,7 +21,7 @@ class Server:
 
         # Specific file is querried
         elif request['type'] == 'image':
-            logging.info("Received image request: {}".format(request['name']))
+            logging.info("Received image request: {}: {}".format(request['level'], request['name']))
             response = self.image_response(request)
             await self.websocket.send(json.dumps(response))
         
@@ -40,9 +40,12 @@ class Server:
         return { 'type': 'filterresponse', 'files': files }
     
     def image_response(self, request):
-        name= request['name']
+        name = request['name']
 
-        image = self.store.get_image_l2(name)
+        if request['level'] == 'l2':
+            image = self.store.get_image_l2(name)
+        else:
+            image = self.store.get_image_l1(name)
 
         return { 'type': 'imageresponse', 'name' : name, 'image' : to_base64(image).decode("ascii") }
 
