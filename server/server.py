@@ -45,7 +45,7 @@ class Server:
 
         if level == 'l2':
             image = self.store.get_image_l2(name)
-        else:
+        elif level == 'l1':
             image = self.store.get_image_l1(name)
 
         return { 'type': 'imageresponse', 'name' : name, 'level' : level, 'image' : to_base64(image).decode("ascii") }
