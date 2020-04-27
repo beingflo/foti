@@ -12,7 +12,6 @@ class Store:
         self.l2 = l2
 
         self.imagelist = self.load_imagelist()
-        self.check_directories()
     
     def get_image_l1(self, name):
         name = os.path.join(self.l1, name)

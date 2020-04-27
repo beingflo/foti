@@ -13,7 +13,6 @@ const Container = styled.div`
    `}
 `
 
-
 function App() {
     const [filter, setFilter] = React.useState('');
 
