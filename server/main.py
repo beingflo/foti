@@ -1,6 +1,7 @@
 import os
 import threading
 import asyncio
+import argparse
 import websockets
 import logging
 from server import Server
@@ -20,12 +21,16 @@ l3 = "/home/florian/.cache/photos/l3/"
 
 logging.basicConfig(level=logging.INFO)
 
-logging.info("Listening on {}:{}".format(ip, port))
+parser = argparse.ArgumentParser(description="Photos server")
+parser.add_argument('--no-thumbnails', action='store_true')
+
+args = parser.parse_args()
 
 store = Store(l0, l1, l2)
 
-handle = threading.Thread(target=store.generate_store)
-handle.start()
+if not args.no_thumbnails:
+    handle = threading.Thread(target=store.generate_store)
+    handle.start()
 
 async def serve(websocket, path):
     logging.info("New websocket connection from {}".format(websocket.remote_address[0]))
@@ -34,6 +39,7 @@ async def serve(websocket, path):
     while True:
         await server.handle_message()
 
+logging.info("Listening on {}:{}".format(ip, port))
 start_server = websockets.serve(serve, ip, port)
 
 asyncio.get_event_loop().run_until_complete(start_server)
