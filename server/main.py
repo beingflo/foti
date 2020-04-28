@@ -24,7 +24,7 @@ logging.info("Listening on {}:{}".format(ip, port))
 
 store = Store(l0, l1, l2)
 
-handle = threading.Thread(target=store.check_directories)
+handle = threading.Thread(target=store.generate_store)
 handle.start()
 
 async def serve(websocket, path):

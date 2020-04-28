@@ -30,7 +30,7 @@ class Store:
     def get_imagelist(self):
         return self.imagelist
 
-    def check_directories(self):
+    def generate_store(self):
         images_dict_l1 = {}
         images_dict_l2 = {}
 
