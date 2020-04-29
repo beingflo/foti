@@ -93,7 +93,7 @@ class Store:
         image = Image.open(abs_file_l0)
 
         new_size = (int(image.size[0] / resize_factor), int(image.size[1] / resize_factor))
-        image = image.resize(new_size,Image.ANTIALIAS)
+        image = image.resize(new_size, Image.ANTIALIAS)
 
         exif = dict(image.getexif())
         exif = dict((ExifTags.TAGS[k], v) for k, v in exif.items() if k in ExifTags.TAGS)
