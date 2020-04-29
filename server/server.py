@@ -43,12 +43,16 @@ class Server:
         name = request['name']
         level = request['level']
 
-        if level == 'l2':
-            image = self.store.get_image_l2(name)
-        elif level == 'l1':
-            image = self.store.get_image_l1(name)
+        try:
+            if level == 'l2':
+                image = self.store.get_image_l2(name)
+            elif level == 'l1':
+                image = self.store.get_image_l1(name)
 
-        return { 'type': 'imageresponse', 'name' : name, 'level' : level, 'image' : to_base64(image).decode("ascii") }
+            return { 'type': 'imageresponse', 'name' : name, 'level' : level, 'image' : to_base64(image).decode("ascii") }
+        except FileNotFoundError:
+            logging.error('File not found: ' + name)
+            return { 'type': 'error', 'description': 'File not found' }
 
 def to_base64(img):
     buffered = BytesIO()

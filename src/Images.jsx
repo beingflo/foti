@@ -111,7 +111,12 @@ class Images extends React.Component {
             const message = evt.data
             const response = JSON.parse(message)
 
-            if (response['type'] === 'filterresponse') {
+            if(response['type'] === 'error') {
+                this.setState(prevState => ({
+                    outstanding_requests: prevState.outstanding_requests - 1,
+                }));
+
+            } else if (response['type'] === 'filterresponse') {
                 let image_list = []
                 response['files'].forEach(file => {
                     image_list.push(file['name'])
@@ -159,13 +164,10 @@ class Images extends React.Component {
             const state_filter = this.state.filter.toLowerCase()
             let new_filtered_list;
             if(props_filter === '') {
-                console.log("empty")
                 new_filtered_list = this.state.image_list
             } else if(props_filter.includes(state_filter)) {
-                console.log("contained")
                 new_filtered_list = this.state.image_list_filtered.filter(name => name.toLowerCase().includes(props_filter))
             } else {
-                console.log("different")
                 new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(props_filter))
             }
 
