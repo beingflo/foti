@@ -2,7 +2,9 @@ import os, os.path
 import logging
 from PIL import Image, ExifTags
 
-L2_SIZE = 800
+QUALITY = 80
+
+L2_SIZE = 400
 L1_RESIZE_FACTOR = 2
 
 class Store:
@@ -72,11 +74,9 @@ class Store:
     def generate_compressed(self, path, file, level):
         if level == 'l1':
             lpath = self.l1
-            quality = 80
             resize_factor = L1_RESIZE_FACTOR
         elif level == 'l2':
             lpath = self.l2
-            quality = 85
 
         abs_path_l0 = os.path.join(self.l0, path)
         abs_file_l0 = os.path.join(abs_path_l0, file)
@@ -116,7 +116,7 @@ class Store:
         elif exif['Orientation'] == 8 : 
             image=image.rotate(90, expand=True)
 
-        image.save(abs_file_lx, optimize=True, quality=quality)
+        image.save(abs_file_lx, optimize=True, quality=QUALITY)
 
     def load_imagelist(self):
         images = []

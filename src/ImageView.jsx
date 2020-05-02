@@ -4,11 +4,13 @@ import styled from 'styled-components'
 const ImagePane = styled.div`
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
 `;
 
 const ColumnContainer = styled.div`
     display: flex;
     flex-direction: column;
+    width: 100%;
 `;
 
 const Image = styled.div`

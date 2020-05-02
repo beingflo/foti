@@ -71,7 +71,7 @@ class Images extends React.Component {
             return;
         }
 
-        const image_height = document.getElementById('image1').clientHeight
+        const image_height = document.getElementById('image0').clientHeight
         const real_height = (image_height * this.state.downloaded_idx) / this.state.columns
 
         if (window.scrollY >= reload_percentage * real_height) {
