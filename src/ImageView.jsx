@@ -43,8 +43,8 @@ function ImageView(props) {
 
     return (
         <ImagePane id="imagepane">
-            { columns.map(col => (
-                <ColumnContainer>
+            { columns.map((col, idx) => (
+                <ColumnContainer key={idx}>
                     { col }
                 </ColumnContainer>
 

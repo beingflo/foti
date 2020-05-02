@@ -13,6 +13,7 @@ class Images extends React.Component {
             images: {},
             image_list: [],
             image_list_filtered: [],
+            columns: 2,
             downloaded_idx: 0,
             outstanding_requests: 0,
             filter: '',
@@ -207,7 +208,7 @@ class Images extends React.Component {
     render() {
         let ret;
         if(this.state.fullscreen_imagename === '') {
-            ret = <ImageView ncolumns={2} images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
+            ret = <ImageView ncolumns={this.state.columns} images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
         } else {
             let image = this.state.images[this.state.fullscreen_imagename]
             if(this.state.fullscreen_image !== null) {
