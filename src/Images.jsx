@@ -76,18 +76,6 @@ class Images extends React.Component {
     }
 
     checkAndFetch() {
-        const topbar = document.getElementById('topbar')
-        if(topbar !== null) {
-            if(this.prev_scroll > window.scrollY) {
-                console.log("scrolling up")
-                topbar.style.top = '0'
-            } else {
-                console.log("scrolling down")
-                topbar.style.top = 'auto'
-            }
-            this.prev_scroll = window.scrollY
-        }
-
         const image = document.getElementById('image0')
         if(image === null) {
             return;
