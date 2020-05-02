@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 const Container = styled.div`
    ${media.mobile`
-      margin: 2% 4%;
+      margin: 0% 4%;
    `}
    ${media.web`
       margin: 0% 35%;

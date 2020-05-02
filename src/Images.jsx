@@ -1,7 +1,7 @@
 import React from 'react'
 import ImageView from './ImageView'
 
-const ws_address = 'ws://192.168.0.157:5678/ws'
+const ws_address = 'ws://192.168.1.196:5678/ws'
 
 const concurrent_image_requests = 10
 const reload_percentage = 0.8
@@ -207,7 +207,7 @@ class Images extends React.Component {
     render() {
         let ret;
         if(this.state.fullscreen_imagename === '') {
-            ret = <ImageView images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
+            ret = <ImageView ncolumns={2} images={this.state.images} image_list={this.state.image_list_filtered} image_click={(e) => this.handle_image_click(e)} />
         } else {
             let image = this.state.images[this.state.fullscreen_imagename]
             if(this.state.fullscreen_image !== null) {

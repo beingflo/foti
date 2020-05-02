@@ -1,30 +1,54 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const ImagePane = styled.div``
+const ImagePane = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
+
+const ColumnContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Image = styled.div`
+    padding: 0px 2px;
+`;
 
 const RoundedImage = styled.img`
-    border-radius: 3px;
+    border-radius: 4px;
 `;
 
 function ImageView(props) {
-    const { images, image_list, image_click } = props;
+    const { images, image_list, image_click, ncolumns } = props;
 
-    let visImgs = []
+    let columns = []
+    for(let k = 0; k < ncolumns; k += 1) {
+        columns[k] = []
+    }
+
     let i = 0;
     while(i < image_list.length && image_list[i] in images) {
-        visImgs.push(
-            <div data-id={image_list[i]} key={image_list[i]} onClick={(e) => image_click(e)}>
-                <RoundedImage src={"data:image/jpg;base64," + images[image_list[i]]} alt="" width="100%" />
-            </div>
-        );
+        let j;
+        for(j = 0; j < ncolumns; j += 1) {
+            columns[j].push(
+                <Image data-id={image_list[i]} key={image_list[i]} onClick={(e) => image_click(e)}>
+                    <RoundedImage src={"data:image/jpg;base64," + images[image_list[i]]} alt="" width="100%" />
+                </Image>
+            );
 
-        i += 1
+            i += 1
+        }
     }
 
     return (
         <ImagePane id="imagepane">
-            { visImgs }
+            { columns.map(col => (
+                <ColumnContainer>
+                    { col }
+                </ColumnContainer>
+
+            ))}
         </ImagePane>
     );
 }

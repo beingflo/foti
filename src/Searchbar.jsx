@@ -1,6 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
 
+const Top = styled.div`
+    position: sticky;
+    top: 0;
+    height: 6vh;
+    box-sizing: border-box;
+    background: white;
+
+    padding: 0 4px;
+`;
+
 const Bar = styled.input`
     width: 100%;
     height: 4vh;
@@ -11,22 +21,13 @@ const Bar = styled.input`
     -moz-appearance: none;
     appearance: none;
 
-    border-radius: 2px;
+    border-radius: 4px;
     border: 1px solid #BBB;
     line-height: 20px;
     outline: none;    
 
-    padding-left: 5px;
-
-`;
-
-const Top = styled.div`
-    position: sticky;
-    top: 0;
-    height: 6vh;
-    padding-top: 1vh;
-    box-sizing: border-box;
-    background: white;
+    margin-top: 1vh;
+    padding-left: 6px;
 `;
 
 class Searchbar extends React.Component {
