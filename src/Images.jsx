@@ -76,6 +76,18 @@ class Images extends React.Component {
     }
 
     checkAndFetch() {
+        const topbar = document.getElementById('topbar')
+        if(topbar !== null) {
+            if(this.prev_scroll > window.scrollY) {
+                console.log("scrolling up")
+                topbar.style.top = '0'
+            } else {
+                console.log("scrolling down")
+                topbar.style.top = 'auto'
+            }
+            this.prev_scroll = window.scrollY
+        }
+
         const image = document.getElementById('image0')
         if(image === null) {
             return;
@@ -112,6 +124,7 @@ class Images extends React.Component {
 
     componentDidMount() {
         window.addEventListener("scroll", e => this.checkAndFetch())
+        this.prev_scroll = window.scrollY
 
         this.ws.onopen = () => {
             console.log('Connected')
@@ -184,7 +197,7 @@ class Images extends React.Component {
                 new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(props_filter))
             }
 
-            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages())
+            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0, outstanding_requests: 0 }, () => this.fetchImages())
 
             window.scrollTo(0,0)
         }
@@ -213,8 +226,6 @@ class Images extends React.Component {
             fullscreen_imagename: '',
             exiting_fullscreen: true,
         })
-
-        console.log(this.state.scroll_at_click)
     }
 
     render() {

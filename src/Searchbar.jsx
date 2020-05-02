@@ -49,7 +49,7 @@ class Searchbar extends React.Component {
 
     render() {
         return (
-            <Top>
+            <Top id="topbar">
                 <Bar type="text" value={this.state.search} onChange={event => this.handleChange(event)} />
             </Top>
         );
