@@ -3,17 +3,27 @@ import ImageView from './ImageView'
 
 const ws_address = 'ws://192.168.1.196:5678/ws'
 
-const concurrent_image_requests = 40
-const reload_percentage = 0.6
+const concurrent_image_requests = 30
+const reload_percentage = 0.8
 
 class Images extends React.Component {
     constructor(props) {
         super(props);
+
+        const is_web = window.matchMedia("(min-width: 1000px)")
+
+        let ncolumns;
+        if(is_web.matches) {
+            ncolumns = 5
+        } else {
+            ncolumns = 3
+        }
+
         this.state = {
             images: {},
             image_list: [],
             image_list_filtered: [],
-            columns: 3,
+            columns: ncolumns,
             downloaded_idx: 0,
             outstanding_requests: 0,
             filter: '',
@@ -174,7 +184,7 @@ class Images extends React.Component {
                 new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(props_filter))
             }
 
-            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(concurrent_image_requests))
+            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages())
 
             window.scrollTo(0,0)
         }

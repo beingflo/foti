@@ -18,7 +18,7 @@ const Image = styled.div`
 `;
 
 const RoundedImage = styled.img`
-    border-radius: 4px;
+    border-radius: 2px;
 `;
 
 function ImageView(props) {
