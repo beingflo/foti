@@ -8,7 +8,7 @@ const Top = styled.div`
     box-sizing: border-box;
     background: white;
 
-    padding: 0 4px;
+    padding: 0 2px;
 `;
 
 const Bar = styled.input`
