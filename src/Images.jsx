@@ -3,8 +3,8 @@ import ImageView from './ImageView'
 
 const ws_address = 'ws://192.168.1.196:5678/ws'
 
-const concurrent_image_requests = 10
-const reload_percentage = 0.8
+const concurrent_image_requests = 40
+const reload_percentage = 0.6
 
 class Images extends React.Component {
     constructor(props) {
@@ -13,7 +13,7 @@ class Images extends React.Component {
             images: {},
             image_list: [],
             image_list_filtered: [],
-            columns: 2,
+            columns: 3,
             downloaded_idx: 0,
             outstanding_requests: 0,
             filter: '',
@@ -71,9 +71,10 @@ class Images extends React.Component {
             return;
         }
 
-        const imagepane_height = document.getElementById('imagepane').clientHeight
+        const image_height = document.getElementById('image1').clientHeight
+        const real_height = (image_height * this.state.downloaded_idx) / this.state.columns
 
-        if (window.scrollY >= reload_percentage * imagepane_height) {
+        if (window.scrollY >= reload_percentage * real_height) {
             if(this.state.outstanding_requests < concurrent_image_requests) {
                 this.fetchImages();
             }

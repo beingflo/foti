@@ -32,7 +32,7 @@ function ImageView(props) {
         let j;
         for(j = 0; j < ncolumns; j += 1) {
             columns[j].push(
-                <Image data-id={image_list[i]} key={image_list[i]} onClick={(e) => image_click(e)}>
+                <Image data-id={image_list[i]} id={"image" + i} key={image_list[i]} onClick={(e) => image_click(e)}>
                     <RoundedImage src={"data:image/jpg;base64," + images[image_list[i]]} alt="" width="100%" />
                 </Image>
             );
