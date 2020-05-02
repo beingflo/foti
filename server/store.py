@@ -2,7 +2,7 @@ import os, os.path
 import logging
 from PIL import Image, ExifTags
 
-L2_RESIZE_FACTOR = 8
+L2_SIZE = 800
 L1_RESIZE_FACTOR = 2
 
 class Store:
@@ -76,8 +76,7 @@ class Store:
             resize_factor = L1_RESIZE_FACTOR
         elif level == 'l2':
             lpath = self.l2
-            quality = 90
-            resize_factor = L2_RESIZE_FACTOR
+            quality = 85
 
         abs_path_l0 = os.path.join(self.l0, path)
         abs_file_l0 = os.path.join(abs_path_l0, file)
@@ -92,8 +91,20 @@ class Store:
 
         image = Image.open(abs_file_l0)
 
-        new_size = (int(image.size[0] / resize_factor), int(image.size[1] / resize_factor))
-        image = image.resize(new_size, Image.ANTIALIAS)
+        if level == 'l1':
+            new_size = (int(image.size[0] / resize_factor), int(image.size[1] / resize_factor))
+            image = image.resize(new_size, Image.ANTIALIAS)
+
+        elif level == 'l2':
+            size = image.size
+            side = min(size)
+            x_diff = (size[0] - side) / 2
+            y_diff = (size[1] - side) / 2
+            new_size = (x_diff, y_diff, side + x_diff, side + y_diff)
+
+            image = image.crop(new_size)
+
+            image = image.resize((L2_SIZE, L2_SIZE), Image.ANTIALIAS)
 
         exif = dict(image.getexif())
         exif = dict((ExifTags.TAGS[k], v) for k, v in exif.items() if k in ExifTags.TAGS)
