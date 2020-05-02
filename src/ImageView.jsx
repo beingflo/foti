@@ -30,6 +30,8 @@ function ImageView(props) {
     }
 
     let i = 0;
+
+outer:
     while(i < image_list.length && image_list[i] in images) {
         let j;
         for(j = 0; j < ncolumns; j += 1) {
@@ -40,6 +42,10 @@ function ImageView(props) {
             );
 
             i += 1
+
+            if(i >= image_list.length || !(image_list[i] in images)) {
+                break outer
+            }
         }
     }
 

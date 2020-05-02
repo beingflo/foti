@@ -66,15 +66,16 @@ class Images extends React.Component {
     }
 
     checkAndFetch() {
-        const imagepane = document.getElementById('imagepane')
-        if(imagepane === null) {
+        const image = document.getElementById('image0')
+        if(image === null) {
             return;
         }
 
-        const image_height = document.getElementById('image0').clientHeight
-        const real_height = (image_height * this.state.downloaded_idx) / this.state.columns
+        const real_height = (image.clientHeight * this.state.downloaded_idx) / this.state.columns
 
-        if (window.scrollY >= reload_percentage * real_height) {
+        const adaptive_reload_percentage = reload_percentage * Math.min(real_height / 10000, 1)
+
+        if (window.scrollY >= adaptive_reload_percentage * real_height) {
             if(this.state.outstanding_requests < concurrent_image_requests) {
                 this.fetchImages();
             }
@@ -173,7 +174,7 @@ class Images extends React.Component {
                 new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(props_filter))
             }
 
-            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(10))
+            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0 }, () => this.fetchImages(concurrent_image_requests))
 
             window.scrollTo(0,0)
         }
