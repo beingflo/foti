@@ -1,5 +1,6 @@
 import React from 'react'
 import ImageView from './ImageView'
+import Connection from './Connection'
 
 const ws_address = 'ws://192.168.1.196:5678/ws'
 
@@ -33,18 +34,7 @@ class Images extends React.Component {
             exiting_fullscreen: false,
         }
 
-        this.ws = new WebSocket(ws_address)
-    }
-
-    fetchSingleImage(name, level) {
-        console.log("Fetching " + level + ": " + name)
-
-        const request = `{
-            "type" : "image",
-            "level" : "${level}",
-            "name" : "${name}"
-        }`
-        this.ws.send(request)
+        this.connection = new Connection(ws_address)
     }
 
     fetchImages(until=0) {
@@ -62,7 +52,7 @@ class Images extends React.Component {
 
             // Not already fetched
             if(!(name in this.state.images)) {
-                this.fetchSingleImage(name, 'l2')
+                this.connection.fetchSingleImage(name, 'l2')
 
                 req += 1
             } else {
@@ -92,36 +82,18 @@ class Images extends React.Component {
         }
     }
 
-    fetchImageList() {
-        const filter = `{
-            "type" : "filter",
-            "filter" : "${this.state.filter}"
-        }`
-
-        this.ws.send(filter)
-    }
-
-    sendInfo(info) {
-        const message = `{
-            "type" : "info",
-            "info" : "${info}"
-        }`
-
-        this.ws.send(message)
-    }
-
     componentDidMount() {
         window.addEventListener("scroll", e => this.checkAndFetch())
         this.prev_scroll = window.scrollY
 
-        this.ws.onopen = () => {
+        this.connection.setOnOpen(() => {
             console.log('Connected')
 
             // Request list of available images in root
-            this.fetchImageList();
-        }
+            this.connection.fetchImageList('');
+        })
 
-        this.ws.onmessage = evt => {
+        this.connection.setOnMessage(evt => {
             const message = evt.data
             const response = JSON.parse(message)
 
@@ -138,7 +110,7 @@ class Images extends React.Component {
 
                 this.setState({ image_list: image_list, image_list_filtered: image_list, downloaded_idx: 0 });
 
-                this.sendInfo('Got list of available images')
+                this.connection.sendInfo('Got list of available images')
 
                 // Request first images
                 this.fetchImages();
@@ -164,11 +136,11 @@ class Images extends React.Component {
                 }
 
             }
-        }
+        })
 
-        this.ws.onclose = () => {
+        this.connection.setOnClose(() => {
             console.log('Disconnected')
-        }
+        })
     }
 
     componentDidUpdate() {
@@ -209,7 +181,7 @@ class Images extends React.Component {
     handle_image_click(e) {
         const name = e.currentTarget.dataset.id
 
-        this.fetchSingleImage(name, 'l1')
+        this.connection.fetchSingleImage(name, 'l1')
 
         this.setState({
             fullscreen_imagename: name,
