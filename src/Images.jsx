@@ -177,15 +177,24 @@ class Images extends React.Component {
             const props_filter = this.props.filter.toLowerCase()
             const state_filter = this.state.filter.toLowerCase()
             let new_filtered_list;
+
             if(props_filter === '') {
                 new_filtered_list = this.state.image_list
-            } else if(props_filter.includes(state_filter)) {
-                new_filtered_list = this.state.image_list_filtered.filter(name => name.toLowerCase().includes(props_filter))
             } else {
-                new_filtered_list = this.state.image_list.filter(name => name.toLowerCase().includes(props_filter))
+                if(props_filter.includes(state_filter)) {
+                    new_filtered_list = this.state.image_list_filtered
+                } else {
+                    new_filtered_list = this.state.image_list
+                }
+
+                const single_filters = props_filter.split(' ')
+
+                for(let i = 0; i < single_filters.length; i += 1) {
+                    new_filtered_list = new_filtered_list.filter(name => name.toLowerCase().includes(single_filters[i]))
+                }
             }
 
-            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0, outstanding_requests: 0 }, () => this.fetchImages())
+            this.setState({ filter: this.props.filter, image_list_filtered: new_filtered_list, downloaded_idx: 0, outstanding_requests: 0 }, () => this.fetchImages(concurrent_image_requests * 2))
 
             window.scrollTo(0,0)
         }
