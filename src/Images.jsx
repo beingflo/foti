@@ -52,7 +52,7 @@ class Images extends React.Component {
 
             // Not already fetched
             if(!(name in this.state.images)) {
-                this.connection.fetchSingleImage(name, 'l2')
+                this.connection.fetchImage(name, 'l2')
 
                 req += 1
             } else {
@@ -85,13 +85,6 @@ class Images extends React.Component {
     componentDidMount() {
         window.addEventListener("scroll", e => this.checkAndFetch())
         this.prev_scroll = window.scrollY
-
-        this.connection.setOnOpen(() => {
-            console.log('Connected')
-
-            // Request list of available images in root
-            this.connection.fetchImageList('');
-        })
 
         this.connection.setOnMessage(evt => {
             const message = evt.data
@@ -137,10 +130,6 @@ class Images extends React.Component {
 
             }
         })
-
-        this.connection.setOnClose(() => {
-            console.log('Disconnected')
-        })
     }
 
     componentDidUpdate() {
@@ -181,7 +170,7 @@ class Images extends React.Component {
     handle_image_click(e) {
         const name = e.currentTarget.dataset.id
 
-        this.connection.fetchSingleImage(name, 'l1')
+        this.connection.fetchImage(name, 'l1')
 
         this.setState({
             fullscreen_imagename: name,

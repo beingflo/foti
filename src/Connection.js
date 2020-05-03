@@ -1,27 +1,53 @@
+const MAX_OUTSTANDING_REQUESTS = 10
+
 export class Connection {
     constructor(address) {
         this.ws = new WebSocket(address)
+        this.address = address
+
+        this.request_queue = []
+        this.outstanding_requests = 0
+
     }
 
-    setOnOpen(func) {
-        this.ws.onopen = func
+    setupWS() {
+        this.ws.onopen = () => {
+            console.log('Connected')
+
+            // Request list of available images in root
+            this.fetchImageList('');
+        }
+
+        const message_handler = evt => {
+            if(this.request_queue.length > 0) {
+                this.saveSend()
+            }
+            this.outstanding_requests -= 1
+
+            // Invoke supplied function
+            this.message_callback(evt)
+        }
+
+        this.ws.onmessage = message_handler
+
+        this.ws.onclose = () => {
+            console.log('Disconnected')
+        }
     }
 
     setOnMessage(func) {
-        this.ws.onmessage = func
-    }
-
-    setOnClose(func) {
-        this.ws.onclose = func
+        this.message_callback = func
+        this.setupWS()
     }
 
     sendInfo(info) {
-        const message = `{
+        const request = `{
             "type" : "info",
             "info" : "${info}"
         }`
 
-        this.ws.send(message)
+        this.request_queue.push(request)
+        this.saveSend()
     }
 
     fetchImageList(filter) {
@@ -30,10 +56,11 @@ export class Connection {
             "filter" : "${filter}"
         }`
 
-        this.ws.send(request)
+        this.request_queue.push(request)
+        this.saveSend()
     }
 
-    fetchSingleImage(name, level) {
+    fetchImage(name, level) {
         console.log("Fetching " + level + ": " + name)
 
         const request = `{
@@ -41,7 +68,22 @@ export class Connection {
             "level" : "${level}",
             "name" : "${name}"
         }`
-        this.ws.send(request)
+
+        this.request_queue.push(request)
+        this.saveSend()
+    }
+
+    saveSend() {
+        if(this.ws.readyState === WebSocket.OPEN) {
+            while(this.request_queue.length > 0 && this.outstanding_requests < MAX_OUTSTANDING_REQUESTS) {
+                this.outstanding_requests += 1
+                const request = this.request_queue.shift()
+                this.ws.send(request)
+            }
+        } else if(this.ws.readyState !== WebSocket.OPEN && this.ws.readyState !== WebSocket.CONNECTING) {
+            this.ws = new WebSocket(this.address)
+            this.setupWS()
+        }
     }
 }
 
